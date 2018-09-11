@@ -1,0 +1,8 @@
+{  
+   "basePackage":"co.com.accenture.service.oferta",
+   "configPackage":"co.com.accenture.service.oferta.config",
+   "apiPackage":"co.com.accenture.service.oferta.api",
+   "modelPackage":"co.com.accenture.service.oferta.model",
+   "groupId":"co.com.accenture.service.oferta",
+   "artifactId":"oferta"
+}

@@ -1,0 +1,322 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Microservicio para gestionar la base de datos de oferta",
+    "version": "1.0.0",
+    "title": "Microservicio oferta",
+    "contact": {
+      "email": "sebastian.henao@accenture.com"
+    }
+  },
+  "host": "localhost:8070",
+  "basePath": "/ofertas",
+  "paths": {
+    "/registrar": {
+      "post": {
+        "tags": [
+          "ofertas"
+        ],
+        "summary": "registro de ofertas",
+        "description": "registro de ofertas",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Json a ingresar",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oferta registrada correctamente",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyResponseSuccess"
+            }
+          },
+          "400": {
+            "description": "Datos incompletos o incorrectos",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyResponseErrors"
+            }
+          }
+        }
+      }
+    },
+    "/listar": {
+      "get": {
+        "tags": [
+          "ofertas"
+        ],
+        "summary": "Retorna todas las ofertas",
+        "description": "Retorna todas las ofertas",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "lista de ofertas",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyRequest"
+            }
+          },
+          "404": {
+            "description": "ofertas no encontradas",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyResponseErrors"
+            }
+          }
+        }
+      }
+    },
+    "/listar/idoferta/{idoferta}": {
+      "get": {
+        "tags": [
+          "ofertas"
+        ],
+        "summary": "buscar oferta por id de oferta",
+        "description": "retorna los negocios que tiene un administrador",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "idoferta",
+            "in": "path",
+            "description": "ID de la oferta",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyRequest"
+            }
+          },
+          "404": {
+            "description": "oferta no encontrado",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyResponseErrors"
+            }
+          }
+        }
+      }
+    },
+    "/listar/producto/{producto}": {
+      "get": {
+        "tags": [
+          "ofertas"
+        ],
+        "summary": "buscar ofertas por producto",
+        "description": "retorna las ofertas de un producto",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "producto",
+            "in": "path",
+            "description": "ofertas por productos",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "listado de ofertas por producto",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyRequest"
+            }
+          },
+          "404": {
+            "description": "ofertas no encontradas",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyResponseErrors"
+            }
+          }
+        }
+      }
+    },
+    "/eliminar/{idoferta}": {
+      "delete": {
+        "tags": [
+          "ofertas"
+        ],
+        "summary": "eliminar oferta por id",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "idoferta",
+            "in": "path",
+            "description": "id de oferta a eliminar",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oferta eliminado",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyResponseSuccess"
+            }
+          },
+          "404": {
+            "description": "id no encontrado",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyResponseErrors"
+            }
+          }
+        }
+      }
+    },
+    "/editar": {
+      "put": {
+        "tags": [
+          "ofertas"
+        ],
+        "summary": "actualizar un oferta existente",
+        "description": "actualizacion de los datos de una oferta",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "oferta que va a ser editada",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oferta editada",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyResponseSuccess"
+            }
+          },
+          "400": {
+            "description": "no se pudo editar la oferta",
+            "schema": {
+              "$ref": "#/definitions/JsonApiBodyResponseErrors"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "JsonApiBodyRequest": {
+      "type": "object",
+      "required": [
+        "oferta"
+      ],
+      "properties": {
+        "oferta": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OfertasRequest"
+          }
+        }
+      }
+    },
+    "OfertasRequest": {
+      "type": "object",
+      "required": [
+        "idoferta",
+        "idnegocio",
+        "producto",
+        "detalle",
+        "valor",
+        "descuento",
+        "foto",
+        "fechainicio",
+        "fechafinal"
+      ],
+      "properties": {
+        "idoferta": {
+          "type": "string"
+        },
+        "idnegocio": {
+          "type": "string"
+        },
+        "producto": {
+          "type": "string"
+        },
+        "detalle": {
+          "type": "string"
+        },
+        "valor": {
+          "type": "string"
+        },
+        "descuento": {
+          "type": "string"
+        },
+        "foto": {
+          "type": "string"
+        },
+        "fechainicio": {
+          "type": "string"
+        },
+        "fechafinal": {
+          "type": "string"
+        }
+      }
+    },
+    "JsonApiBodyResponseErrors": {
+      "type": "object",
+      "required": [
+        "codigo",
+        "detalle"
+      ],
+      "properties": {
+        "codigo": {
+          "type": "string"
+        },
+        "detalle": {
+          "type": "string"
+        }
+      }
+    },
+    "JsonApiBodyResponseSuccess": {
+      "type": "object",
+      "required": [
+        "idoferta",
+        "producto",
+        "detalle",
+        "idnegocio"
+      ],
+      "properties": {
+        "idoferta": {
+          "type": "string"
+        },
+        "idnegocio": {
+          "type": "string"
+        },
+        "producto": {
+          "type": "string"
+        },
+        "detalle": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
