@@ -35,6 +35,15 @@ public interface ListarApi {
         produces = { "application/json" }, 
         method = RequestMethod.GET)
     ResponseEntity<?> listarGet();
+    
+    @ApiOperation(value = "Retorna todas las ofertas activas", nickname = "listarGet", notes = "Retorna todas las ofertas activas", response = JsonApiBodyRequest.class, tags={ "ofertas", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "lista de ofertas activas", response = JsonApiBodyRequest.class),
+        @ApiResponse(code = 404, message = "ofertas activas no encontradas", response = JsonApiBodyResponseErrors.class) })
+    @RequestMapping(value = "/listar/activas",
+        produces = { "application/json" }, 
+        method = RequestMethod.GET)
+    ResponseEntity<?> listarGetActivas();
 
     
     @ApiOperation(value = "buscar oferta por id de negocio", nickname = "listarIdnegocioIdnegocioGet", notes = "retorna las ofertas que tiene un negocio", response = JsonApiBodyRequest.class, tags={ "ofertas", })

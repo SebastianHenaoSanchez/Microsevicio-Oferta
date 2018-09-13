@@ -4,11 +4,14 @@ import co.com.accenture.service.oferta.model.JsonApiBodyRequest;
 import co.com.accenture.service.oferta.model.JsonApiBodyResponseErrors;
 import co.com.accenture.service.oferta.model.OfertasRequest;
 import co.com.accenture.service.oferta.repository.UserRepository;
+import co.com.accenture.service.oferta.utils.fechaactual;
 
 import com.amazonaws.Response;
 import com.amazonaws.services.codedeploy.model.RegisterApplicationRevisionRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +29,10 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-08-26T21:24:59.171-05:00")
 
@@ -34,7 +40,8 @@ import java.util.List;
 public class ListarApiController implements ListarApi {
 	 @Autowired
 	 UserRepository ofertaRepository;
-	
+
+	fechaactual fecha = new fechaactual();
     private static final Logger log = LoggerFactory.getLogger(ListarApiController.class);
 
     private final ObjectMapper objectMapper;
@@ -50,6 +57,7 @@ public class ListarApiController implements ListarApi {
     public ResponseEntity<?> listarGet() {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
+        	System.out.println(fecha.Obtenerfecha());
             JsonApiBodyResponseErrors ResponseError = new JsonApiBodyResponseErrors();
 			List<OfertasRequest> ofertas = (List<OfertasRequest>) ofertaRepository.findAll();
 			JsonApiBodyRequest body = new JsonApiBodyRequest();
@@ -63,6 +71,41 @@ public class ListarApiController implements ListarApi {
 			return new ResponseEntity<JsonApiBodyRequest>(body, HttpStatus.OK);
         }
 
+        return new ResponseEntity<JsonApiBodyRequest>(HttpStatus.NOT_IMPLEMENTED);
+    }
+    
+    public ResponseEntity<?> listarGetActivas() {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+        	
+            JsonApiBodyResponseErrors ResponseError = new JsonApiBodyResponseErrors();
+			List<OfertasRequest> ofertas = (List<OfertasRequest>) ofertaRepository.findAll();
+			
+			if(ofertas.isEmpty()) {
+				ResponseError.setCodigo("1");
+				ResponseError.setDetalle("Base de datos vacia");
+				return new ResponseEntity<JsonApiBodyResponseErrors>(ResponseError, HttpStatus.FAILED_DEPENDENCY);
+			}
+			//buscamos las ofertas activas
+			Date fechaActual = fecha.Obtenerfecha();
+			//System.out.println("fecha actual: " +fechaActual);
+			List<OfertasRequest> ofertasactivas = new ArrayList<OfertasRequest>();
+			for(int i=0; i< ofertas.size(); i++) {
+				
+				Date fechaFin= fecha.ObtenerFechaBD(ofertas.get(i).getFechafinal());
+				//System.out.println("fecha final:" +fechaFin);
+				
+				if(fechaFin.after(fechaActual) || fechaFin.equals(fechaActual)) {
+				//	System.out.println("fecha final mayor");
+					ofertasactivas.add(ofertas.get(i));
+				}else {
+					System.out.println("fecha inicial mayor");
+				}
+			}											
+			JsonApiBodyRequest body = new JsonApiBodyRequest();		
+			body.setOferta(ofertasactivas);			
+			return new ResponseEntity<JsonApiBodyRequest>(body, HttpStatus.OK);
+        }
         return new ResponseEntity<JsonApiBodyRequest>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -105,9 +148,25 @@ public class ListarApiController implements ListarApi {
                     	return new ResponseEntity<JsonApiBodyResponseErrors> (responseError, HttpStatus.NOT_IMPLEMENTED);
             			
             		}
+            		//buscamos las ofertas activas
+        			Date fechaActual = fecha.Obtenerfecha();
+        			//System.out.println("fecha actual: " +fechaActual);
+        			List<OfertasRequest> ofertasactivas = new ArrayList<OfertasRequest>();
+        			for(int i=0; i< ofertas.size(); i++) {
+        				
+        				Date fechaFin= fecha.ObtenerFechaBD(ofertas.get(i).getFechafinal());
+        				//System.out.println("fecha final:" +fechaFin);
+        				
+        				if(fechaFin.after(fechaActual) || fechaFin.equals(fechaActual)) {
+        				//	System.out.println("fecha final mayor");
+        					ofertasactivas.add(ofertas.get(i));
+        				}else {
+        					System.out.println("fecha inicial mayor");
+        				}
+        			}
             		JsonApiBodyRequest body = new JsonApiBodyRequest();
     
-            		body.setOferta(ofertas);
+            		body.setOferta(ofertasactivas);
                 return new ResponseEntity<JsonApiBodyRequest>(body, HttpStatus.OK);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
@@ -124,16 +183,33 @@ public class ListarApiController implements ListarApi {
              try {
              	JsonApiBodyResponseErrors responseError = new JsonApiBodyResponseErrors();
              		List<OfertasRequest> ofertas = ofertaRepository.findByIdnegocioAndTipooferta(idnegocio, tipooferta);
-             				
+             		//System.out.println("idnegocio: "+idnegocio+" tipo oferta: "+tipooferta);		
              		if(idnegocio == null || ofertas == null || ofertas.isEmpty() || tipooferta == null) {
              			responseError.setCodigo("2222");
                      	responseError.setDetalle("Id_negocio o tipo de oferta no ingresado o no existen ofertas para este negocio");
                      	return new ResponseEntity<JsonApiBodyResponseErrors> (responseError, HttpStatus.NOT_IMPLEMENTED);
              			
              		}
+             		
+             		//buscamos que las ofertas esten activas
+        			Date fechaActual = fecha.Obtenerfecha();
+        			//System.out.println("fecha actual: " +fechaActual);
+        			List<OfertasRequest> ofertasactivas = new ArrayList<OfertasRequest>();
+        			for(int i=0; i< ofertas.size(); i++) {
+        				
+        				Date fechaFin= fecha.ObtenerFechaBD(ofertas.get(i).getFechafinal());
+        				//System.out.println("fecha final:" +fechaFin);
+        				
+        				if(fechaFin.after(fechaActual) || fechaFin.equals(fechaActual)) {
+        				//	System.out.println("fecha final mayor");
+        					ofertasactivas.add(ofertas.get(i));
+        				}/*else {
+        					System.out.println("fecha inicial mayor");
+        				}*/
+        			}
              		JsonApiBodyRequest body = new JsonApiBodyRequest();
      
-             		body.setOferta(ofertas);
+             		body.setOferta(ofertasactivas);
                  return new ResponseEntity<JsonApiBodyRequest>(body, HttpStatus.OK);
              } catch (Exception e) {
                  log.error("Couldn't serialize response for content type application/json", e);
