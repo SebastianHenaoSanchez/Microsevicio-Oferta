@@ -219,6 +219,49 @@ public class ListarApiController implements ListarApi {
 
          return new ResponseEntity<JsonApiBodyRequest>(HttpStatus.NOT_IMPLEMENTED);
     }
+    
+    public ResponseEntity <?> filtroGet (@ApiParam(value = "ID del negocio, tipo oferta, tag",required=true) @PathVariable("idnegocio") String idnegocio, @PathVariable("tipooferta") String tipooferta, @PathVariable("tag") String tag) {
+   	 String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            try {
+            	JsonApiBodyResponseErrors responseError = new JsonApiBodyResponseErrors();
+            		List<OfertasRequest> ofertas = ofertaRepository.findByIdnegocioAndTipooferta(idnegocio, tipooferta);
+            		//System.out.println("idnegocio: "+idnegocio+" tipo oferta: "+tipooferta);		
+            		if(idnegocio == null || ofertas == null || ofertas.isEmpty() || tipooferta == null) {
+            			responseError.setCodigo("2222");
+                    	responseError.setDetalle("Id_negocio o tipo de oferta no ingresado o no existen ofertas para este negocio");
+                    	return new ResponseEntity<JsonApiBodyResponseErrors> (responseError, HttpStatus.NOT_IMPLEMENTED);
+            			
+            		}
+            		
+            		//buscamos que las ofertas esten activas
+       			Date fechaActual = fecha.Obtenerfecha();
+       			//System.out.println("fecha actual: " +fechaActual);
+       			List<OfertasRequest> ofertasactivas = new ArrayList<OfertasRequest>();
+       			for(int i=0; i< ofertas.size(); i++) {
+       				
+       				Date fechaFin= fecha.ObtenerFechaBD(ofertas.get(i).getFechafinal());
+       				//System.out.println("fecha final:" +fechaFin);
+       				
+       				if(fechaFin.after(fechaActual) || fechaFin.equals(fechaActual)) {
+       				//	System.out.println("fecha final mayor");
+       					ofertasactivas.add(ofertas.get(i));
+       				}/*else {
+       					System.out.println("fecha inicial mayor");
+       				}*/
+       			}
+            		JsonApiBodyRequest body = new JsonApiBodyRequest();
+    
+            		body.setOferta(ofertasactivas);
+                return new ResponseEntity<JsonApiBodyRequest>(body, HttpStatus.OK);
+            } catch (Exception e) {
+                log.error("Couldn't serialize response for content type application/json", e);
+                System.out.println("problemas al listar por idnegocio y tipo de oferta");
+            }
+        }
+
+        return new ResponseEntity<JsonApiBodyRequest>(HttpStatus.NOT_IMPLEMENTED);
+   }
 
     public ResponseEntity<JsonApiBodyRequest> listarProductoProductoGet(@ApiParam(value = "ofertas por productos",required=true) @PathVariable("producto") String producto) {
         String accept = request.getHeader("Accept");

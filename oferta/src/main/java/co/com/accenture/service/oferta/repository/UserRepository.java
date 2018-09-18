@@ -13,5 +13,6 @@ public interface UserRepository extends CrudRepository<OfertasRequest, String>{
 	//public List<RegistrarRequest> findByEmail(String email);
 	public List<OfertasRequest> findByIdnegocio (String idnegocio);
 	public List<OfertasRequest> findByIdnegocioAndTipooferta (String idnegocio, String tipooferta);
+	public List<OfertasRequest> findByIdnegocioAndTipoofertaAndDescuento (String idnegocio, String tipooferta, String tag);
 	
 }

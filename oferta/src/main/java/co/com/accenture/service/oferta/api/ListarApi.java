@@ -65,6 +65,17 @@ public interface ListarApi {
         method = RequestMethod.GET)
     ResponseEntity<?> listarIdnegocioIdnegocioTipoOfertaGet(@ApiParam(value = "ID del negocio",required=true) @PathVariable("idnegocio") String idnegocio,  @PathVariable("tipooferta") String tipooferta);
 
+    //listar por idnegocio,tipo de oferta y el descuento o promocioin elegida
+    @ApiOperation(value = "buscar oferta por id de negocio, tipo de oferta y descuento o promocion", nickname = "filtroGet", notes = "retorna las ofertas que tiene un negocio dependiendo si es descuento o promocion", response = JsonApiBodyRequest.class, tags={ "ofertas", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = JsonApiBodyRequest.class),
+        @ApiResponse(code = 404, message = "id_negocio no encontrado", response = JsonApiBodyResponseErrors.class) })
+    @RequestMapping(value = "/filtro/{idnegocio}/{tipooferta}/{tag}",
+        produces = { "application/json" }, 
+        method = RequestMethod.GET)
+    ResponseEntity<?> filtroGet(@ApiParam(value = "ID del negocio, tipo oferta, tag de promo o descuento",required=true) @PathVariable("idnegocio") String idnegocio,  @PathVariable("tipooferta") String tipooferta, @PathVariable("tag") String tag);
+
+    
     @ApiOperation(value = "buscar oferta por id de oferta", nickname = "listarIdofertaIdofertaGet", notes = "retorna los negocios que tiene un administrador", response = JsonApiBodyRequest.class, tags={ "ofertas", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = JsonApiBodyRequest.class),
